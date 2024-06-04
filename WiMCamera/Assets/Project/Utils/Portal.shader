@@ -3,6 +3,7 @@ Shader "Unlit/Portal"
     Properties
     {
         _InactiveColour("Inactive Colour", Color) = (1, 1, 1, 0)
+        _multiplierValue("IPD", float) = 0.01
     }
     SubShader
     {
@@ -39,6 +40,8 @@ Shader "Unlit/Portal"
             int displayMask;
             float4 _InactiveColour;
 
+            float _multiplierValue;
+
             v2f vert (appdata v)
             {
                 v2f o;
@@ -47,16 +50,21 @@ Shader "Unlit/Portal"
                 UNITY_INITIALIZE_OUTPUT(v2f, o); //Insert
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); //Insert
 
-                
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
                 float2 uv = i.screenPos.xy / i.screenPos.w;
-                fixed4 portalCol = tex2D(_MainTex, uv);
+                float2 multiplier = float2(_multiplierValue , 0);
+                if (unity_StereoEyeIndex == 0) {
+                    multiplier = -1 * multiplier;
+                }
+
+                fixed4 portalCol = tex2D(_MainTex, uv + multiplier);
+
                 return portalCol;// *displayMask + _InactiveColour * (1 - displayMask);
             }
             ENDCG

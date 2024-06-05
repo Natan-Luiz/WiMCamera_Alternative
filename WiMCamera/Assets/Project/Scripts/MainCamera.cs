@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -17,7 +18,8 @@ public class MainCamera : MonoBehaviour
 
     protected void CustomOnPostRender(ScriptableRenderContext context, Camera camera)
     {
-        if (drawMinimapEnabled)
+        Camera c = SceneView.GetAllSceneCameras()?[0];
+        if (drawMinimapEnabled && c != camera)
         {
             camControl.Render();
         }

@@ -14,6 +14,6 @@ public class CanvasLookAt : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.LookAt(target);
+        transform.LookAt((transform.position - target.position) + transform.position);
     }
 }

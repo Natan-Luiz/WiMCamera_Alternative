@@ -12,7 +12,6 @@ public class PortalTraveller : MonoBehaviour
     public Material[] originalMaterials { get; set; }
     public Material[] cloneMaterials { get; set; }
 
-
     public virtual void EnterPortalThreshold()
     {
         if (graphicsClone == null)
@@ -27,6 +26,7 @@ public class PortalTraveller : MonoBehaviour
         {
             graphicsClone.SetActive(true);
         }
+        Debug.Log("Mats: " + originalMaterials.Length);
     }
 
     // Called once no longer touching portal (excluding when teleporting)
@@ -59,6 +59,7 @@ public class PortalTraveller : MonoBehaviour
     Material[] GetMaterials(GameObject g)
     {
         var renderers = g.GetComponentsInChildren<MeshRenderer>();
+
         var matList = new List<Material>();
         foreach (var renderer in renderers)
         {
@@ -67,6 +68,17 @@ public class PortalTraveller : MonoBehaviour
                 matList.Add(mat);
             }
         }
+
+        var rds2 = g.GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (var renderer in rds2)
+        {
+            foreach (var mat in renderer.materials)
+            {
+                matList.Add(mat);
+            }
+        }
         return matList.ToArray();
     }
+
+
 }

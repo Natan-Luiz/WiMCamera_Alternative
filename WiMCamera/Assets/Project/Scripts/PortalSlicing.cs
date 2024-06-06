@@ -6,7 +6,7 @@ public class PortalSlicing : MonoBehaviour
 {
     RelateObjects here;
     RelateObjects there;
-    MeshFilter screenMeshFilter;
+    RelateCams portalController;
     List<PortalTraveller> trackedTravellers;
     public float screenThickness = 0.01f;
 
@@ -15,11 +15,11 @@ public class PortalSlicing : MonoBehaviour
         HandleTravellers();
     }
 
-    public void Initialize(RelateObjects local, RelateObjects remote)
+    public void Initialize(RelateObjects local, RelateObjects remote, RelateCams portal)
     {
+        portalController = portal;
         here = local;
         there = remote;
-        screenMeshFilter = here.planeView.GetComponent<MeshFilter>();
         trackedTravellers = new List<PortalTraveller>();
     }
 
@@ -30,9 +30,9 @@ public class PortalSlicing : MonoBehaviour
             PortalTraveller traveller = trackedTravellers[i];
             Transform travellerT = traveller.transform;
 
-            var m = there.planeView.transform.localToWorldMatrix * here.planeView.transform.worldToLocalMatrix * travellerT.localToWorldMatrix;
+            var m = there.worldCenter.transform.localToWorldMatrix * here.worldCenter.transform.worldToLocalMatrix * travellerT.localToWorldMatrix;
 
-            Vector3 offsetFromPortal = travellerT.position - here.planeView.transform.position;
+            Vector3 offsetFromPortal = travellerT.position - here.worldCenter.transform.position;
 
             traveller.graphicsClone?.transform.SetPositionAndRotation(m.GetColumn(3), m.rotation);
             traveller.previousOffsetFromPortal = offsetFromPortal;
@@ -42,7 +42,7 @@ public class PortalSlicing : MonoBehaviour
     void UpdateSliceParams(PortalTraveller traveller)
     {
         Vector3 sliceNormal = here.planeView.transform.forward;
-        Vector3 cloneSliceNormal = -here.planeView.transform.forward;
+        Vector3 cloneSliceNormal = -there.planeView.transform.forward;
 
         Vector3 slicePos = here.planeView.transform.position;
         Vector3 cloneSlicePos = there.planeView.transform.position;
@@ -95,12 +95,14 @@ public class PortalSlicing : MonoBehaviour
         return SideOfPortal(posA) == SideOfPortal(posB);
     }
 
-
     void OnTravellerEnterPortal(PortalTraveller traveller)
     {
         if (!trackedTravellers.Contains(traveller))
         {
-            traveller.EnterPortalThreshold();
+            if (traveller.EnterPortalThresholdFirstTime())
+            {
+                traveller.SetCloneSize(portalController.sizeDiff);
+            }
             traveller.previousOffsetFromPortal = traveller.transform.position - here.planeView.transform.position;
             trackedTravellers.Add(traveller);
         }

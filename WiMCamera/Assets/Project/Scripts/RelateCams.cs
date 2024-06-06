@@ -37,7 +37,7 @@ public class RelateCams : MonoBehaviour
     private void Awake()
     {
         portalSlicing = GetComponent<PortalSlicing>();
-        portalSlicing.Initialize(here,there);
+        portalSlicing.Initialize(here,there, this);
         screen.material.SetInt("displayMask", 1);
     }
 
@@ -51,6 +51,14 @@ public class RelateCams : MonoBehaviour
         portalSlicing.UpdateTravelers();
     }
 
+    public void SetTransform(Transform t, Matrix4x4 localToWorld)
+    {
+        Vector3 renderPosition = localToWorld.GetColumn(3);
+        Quaternion renderRotation = localToWorld.rotation;
+
+        t.SetPositionAndRotation(renderPosition, renderRotation);
+    }
+
     public void Render()
     {
         if (!CameraUtils.VisibleFromCamera(screen, here.cam))
@@ -60,25 +68,25 @@ public class RelateCams : MonoBehaviour
 
         PrePortalRender();
 
-        float playerD = Vector3.Distance(here.cam.transform.position, here.planeView.transform.position);
-        // The following lines manually adapt the scale, deprecated because of the sizeDiff variable
-        // float worldD = Vector3.Distance(there.cam.transform.parent.position, centerMultiplier.transform.position);
-        // multilier = worldD / playerD;
-
         CreateViewTexture();
+
+
+
+        there.planeView.transform.localPosition = here.planeView.transform.localPosition;
+        there.planeView.transform.localRotation = here.planeView.transform.localRotation;
 
         var localToWorldMatrix = here.cam.transform.localToWorldMatrix;
 
-        Vector3 renderPosition;
-        Quaternion renderRotation;
-
         there.cam.projectionMatrix = here.cam.projectionMatrix;
-        there.planeView.transform.localScale = Vector3.one * sizeDiff;
-        localToWorldMatrix = there.planeView.transform.localToWorldMatrix * screen.transform.worldToLocalMatrix * localToWorldMatrix;
-        renderPosition = localToWorldMatrix.GetColumn(3);
-        renderRotation = localToWorldMatrix.rotation;
+        there.worldCenter.transform.localScale = Vector3.one * sizeDiff * here.planeView.transform.localScale.x;
+        localToWorldMatrix = there.worldCenter.transform.localToWorldMatrix * here.worldCenter.worldToLocalMatrix * localToWorldMatrix;
 
-        there.cam.transform.SetPositionAndRotation(renderPosition, renderRotation);
+        SetTransform(there.cam.transform,localToWorldMatrix);
+
+
+        
+
+
         //SetNearClipPlane();
         portalSlicing.HandleClipping();
         //there.cam.Render();
@@ -96,7 +104,7 @@ public class RelateCams : MonoBehaviour
                 viewTexture.Release();
             }
 
-            viewTexture = new RenderTexture(XRSettings.eyeTextureWidth, XRSettings.eyeTextureHeight, 0);
+            viewTexture = new RenderTexture(XRSettings.eyeTextureWidth*2, XRSettings.eyeTextureHeight, 0);
             there.cam.targetTexture = viewTexture;
             screen.material.SetTexture("_MainTex", viewTexture);
         }

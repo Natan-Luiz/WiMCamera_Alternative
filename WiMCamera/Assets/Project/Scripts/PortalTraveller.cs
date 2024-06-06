@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +13,7 @@ public class PortalTraveller : MonoBehaviour
     public Material[] originalMaterials { get; set; }
     public Material[] cloneMaterials { get; set; }
 
-    public virtual void EnterPortalThreshold()
+    public virtual bool EnterPortalThresholdFirstTime()
     {
         if (graphicsClone == null)
         {
@@ -21,12 +22,13 @@ public class PortalTraveller : MonoBehaviour
             graphicsClone.transform.localScale = graphicsObject.transform.localScale;
             originalMaterials = GetMaterials(graphicsObject);
             cloneMaterials = GetMaterials(graphicsClone);
+            return true;
         }
         else
         {
             graphicsClone.SetActive(true);
         }
-        Debug.Log("Mats: " + originalMaterials.Length);
+        return false;
     }
 
     // Called once no longer touching portal (excluding when teleporting)
@@ -80,5 +82,8 @@ public class PortalTraveller : MonoBehaviour
         return matList.ToArray();
     }
 
-
+    internal void SetCloneSize(float sizeDiff)
+    {
+        graphicsClone.transform.localScale *= sizeDiff;
+    }
 }

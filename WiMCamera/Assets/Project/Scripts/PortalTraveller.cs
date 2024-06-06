@@ -1,14 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.XR.CoreUtils;
 using UnityEngine;
 
 public class PortalTraveller : MonoBehaviour
 {
     public GameObject graphicsObject;
     public GameObject graphicsClone { get; set; }
-
-    public Vector3 previousOffsetFromPortal { get; set; }
 
     public Material[] originalMaterials { get; set; }
     public Material[] cloneMaterials { get; set; }
@@ -18,7 +17,9 @@ public class PortalTraveller : MonoBehaviour
         if (graphicsClone == null)
         {
             graphicsClone = Instantiate(graphicsObject);
+            graphicsClone.SetLayerRecursively(LayerMask.NameToLayer("CamOnly"));
             graphicsClone.transform.parent = graphicsObject.transform.parent;
+            graphicsClone.transform.localRotation = graphicsObject.transform.localRotation;
             graphicsClone.transform.localScale = graphicsObject.transform.localScale;
             originalMaterials = GetMaterials(graphicsObject);
             cloneMaterials = GetMaterials(graphicsClone);
@@ -84,6 +85,6 @@ public class PortalTraveller : MonoBehaviour
 
     internal void SetCloneSize(float sizeDiff)
     {
-        graphicsClone.transform.localScale *= sizeDiff;
+        graphicsClone.transform.localScale = graphicsObject.transform.localScale * sizeDiff;
     }
 }

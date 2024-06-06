@@ -71,7 +71,7 @@ Shader "Unlit/Portal"
                uv.x = (uv.x) + multiplier;
 
                 fixed4 portalCol = tex2D(_MainTex, uv);
-
+                //portalCol.w *= 0.5f;
                 return portalCol;// *displayMask + _InactiveColour * (1 - displayMask);
             }
             ENDCG

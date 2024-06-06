@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.XR;
 
 [Serializable]
@@ -23,9 +24,13 @@ public class RelateCams : MonoBehaviour
 
     RenderTexture viewTexture;
 
-    bool VRenabled = false; // true if VR eyeWidth is true and useable for renderTexture
+    public bool VRenabled = false; // true if VR eyeWidth is true and useable for renderTexture
+
+    public bool singleRes = false;
 
     public float sizeDiff = 24;
+
+    public float LensIPD = 0.07f;
 
     [Header("Advanced Settings")]
     public float nearClipOffset = 0.05f;
@@ -70,14 +75,12 @@ public class RelateCams : MonoBehaviour
 
         CreateViewTexture();
 
-
-
         there.planeView.transform.localPosition = here.planeView.transform.localPosition;
         there.planeView.transform.localRotation = here.planeView.transform.localRotation;
 
         var localToWorldMatrix = here.cam.transform.localToWorldMatrix;
 
-        there.cam.projectionMatrix = here.cam.projectionMatrix;
+        //there.cam.projectionMatrix = here.cam.projectionMatrix;
         there.worldCenter.transform.localScale = Vector3.one * sizeDiff * here.planeView.transform.localScale.x;
         localToWorldMatrix = there.worldCenter.transform.localToWorldMatrix * here.worldCenter.worldToLocalMatrix * localToWorldMatrix;
 
@@ -89,6 +92,7 @@ public class RelateCams : MonoBehaviour
 
         //SetNearClipPlane();
         portalSlicing.HandleClipping();
+        //UniversalRenderPipeline.RenderSingleCamera(there.cam);
         //there.cam.Render();
     }
 
@@ -103,25 +107,27 @@ public class RelateCams : MonoBehaviour
             {
                 viewTexture.Release();
             }
-
-            viewTexture = new RenderTexture(XRSettings.eyeTextureWidth*2, XRSettings.eyeTextureHeight, 0);
+            if(singleRes)
+                viewTexture = new RenderTexture(XRSettings.eyeTextureWidth * 1, XRSettings.eyeTextureHeight, 0);
+            else
+                viewTexture = new RenderTexture(XRSettings.eyeTextureWidth * 2, XRSettings.eyeTextureHeight, 0);
             there.cam.targetTexture = viewTexture;
             screen.material.SetTexture("_MainTex", viewTexture);
+            screen.material.SetFloat("_multiplierValue", LensIPD);
         }
         else if(!VRenabled)
         {
             if (viewTexture == null || viewTexture.width != Screen.width || viewTexture.height != Screen.height)
             {
-                Debug.LogError("Gen RenderTexture Normal : " + viewTexture?.width + " " +  Screen.width + " " + viewTexture?.height + " "  + Screen.height);
                 if (viewTexture != null)
                 {
-                    Debug.LogError("Release View");
                     viewTexture.Release();
                 }
                 viewTexture = new RenderTexture(Screen.width, Screen.height, 0);   
-                // Render the view from the portal camera to the view texture
+
                 there.cam.targetTexture = viewTexture;
-                // Display the view texture on the screen of the linked portal
+
+                screen.material.SetFloat("_multiplierValue", 0);
                 screen.material.SetTexture("_MainTex", viewTexture);
             }
         }

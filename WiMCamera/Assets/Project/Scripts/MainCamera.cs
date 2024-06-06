@@ -13,10 +13,10 @@ public class MainCamera : MonoBehaviour
     // Start is called before the first frame update
     void OnEnable()
     {
-        RenderPipelineManager.beginCameraRendering += CustomOnPostRender;
+        RenderPipelineManager.beginCameraRendering += CustomOnPreRender;
     }
 
-    protected void CustomOnPostRender(ScriptableRenderContext context, Camera camera)
+    protected void CustomOnPreRender(ScriptableRenderContext context, Camera camera)
     {
         Camera c = SceneView.GetAllSceneCameras()?[0];
         if (drawMinimapEnabled && c != camera)
@@ -27,11 +27,11 @@ public class MainCamera : MonoBehaviour
 
     private void OnDisable()
     {
-        RenderPipelineManager.beginCameraRendering -= CustomOnPostRender;
+        RenderPipelineManager.beginCameraRendering -= CustomOnPreRender;
     }
 
     private void OnDestroy()
     {
-        RenderPipelineManager.beginCameraRendering -= CustomOnPostRender;
+        RenderPipelineManager.beginCameraRendering -= CustomOnPreRender;
     }
 }

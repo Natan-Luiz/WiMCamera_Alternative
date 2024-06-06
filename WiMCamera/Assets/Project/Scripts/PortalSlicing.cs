@@ -35,12 +35,12 @@ public class PortalSlicing : MonoBehaviour
             Vector3 offsetFromPortal = travellerT.position - here.worldCenter.transform.position;
 
             traveller.graphicsClone?.transform.SetPositionAndRotation(m.GetColumn(3), m.rotation);
-            traveller.previousOffsetFromPortal = offsetFromPortal;
         }
     }
 
     void UpdateSliceParams(PortalTraveller traveller)
     {
+        traveller.SetCloneSize(portalController.sizeDiff / here.worldCenter.transform.lossyScale.x);
         Vector3 sliceNormal = here.planeView.transform.forward;
         Vector3 cloneSliceNormal = -there.planeView.transform.forward;
 
@@ -51,7 +51,7 @@ public class PortalSlicing : MonoBehaviour
         float cloneSliceOffsetDst = 0;
 
         cloneSliceOffsetDst = -screenThickness;
-
+        return;
         for (int i = 0; i < traveller.originalMaterials.Length; i++)
         {
             traveller.originalMaterials[i].SetVector("_sliceCenter", slicePos);
@@ -85,16 +85,6 @@ public class PortalSlicing : MonoBehaviour
         }
     }
 
-    int SideOfPortal(Vector3 pos)
-    {
-        return System.Math.Sign(Vector3.Dot(pos - here.planeView.transform.position, here.planeView.transform.forward));
-    }
-
-    bool SameSideOfPortal(Vector3 posA, Vector3 posB)
-    {
-        return SideOfPortal(posA) == SideOfPortal(posB);
-    }
-
     void OnTravellerEnterPortal(PortalTraveller traveller)
     {
         if (!trackedTravellers.Contains(traveller))
@@ -103,7 +93,6 @@ public class PortalSlicing : MonoBehaviour
             {
                 traveller.SetCloneSize(portalController.sizeDiff);
             }
-            traveller.previousOffsetFromPortal = traveller.transform.position - here.planeView.transform.position;
             trackedTravellers.Add(traveller);
         }
     }

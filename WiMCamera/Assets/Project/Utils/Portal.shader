@@ -2,6 +2,7 @@ Shader "Unlit/Portal"
 {
     Properties
     {
+        _MainTex("MainTex", 2D) = "" {}
         _InactiveColour("Inactive Colour", Color) = (1, 1, 1, 0)
         _multiplierValue("IPD", float) = 0.01
     }
@@ -31,6 +32,7 @@ Shader "Unlit/Portal"
             {
                 float4 vertex : SV_POSITION;
                 float4 screenPos : TEXCOORD0;
+                float4 eyeData : TEXCOORD1;
 
                 UNITY_VERTEX_OUTPUT_STEREO //Insert
             };
@@ -50,6 +52,7 @@ Shader "Unlit/Portal"
                 UNITY_INITIALIZE_OUTPUT(v2f, o); //Insert
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); //Insert
 
+                o.eyeData = float4(unity_StereoEyeIndex, 0, 0, 0);
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.screenPos = ComputeScreenPos(o.vertex);
                 return o;
@@ -57,11 +60,15 @@ Shader "Unlit/Portal"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float2 uv = i.screenPos.xy / i.screenPos.w;
-                float2 multiplier = float2(_multiplierValue , 0);
-                if (unity_StereoEyeIndex == 0) {
-                    multiplier = -1 * multiplier;
-                }
+                float2 uv = i.screenPos.xy;
+                
+                uv = uv / i.screenPos.w;
+
+                
+                
+
+               float multiplier = i.eyeData.x == 0 ?  - _multiplierValue.x : _multiplierValue.x;
+               uv.x = (uv.x) + multiplier;
 
                 fixed4 portalCol = tex2D(_MainTex, uv);
 

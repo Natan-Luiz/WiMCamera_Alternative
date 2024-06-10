@@ -24,6 +24,7 @@ Shader "Unlit/Portal"
             struct appdata
             {
                 float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
 
                 UNITY_VERTEX_INPUT_INSTANCE_ID //Insert
             };
@@ -33,6 +34,7 @@ Shader "Unlit/Portal"
                 float4 vertex : SV_POSITION;
                 float4 screenPos : TEXCOORD0;
                 float4 eyeData : TEXCOORD1;
+                float2 uv : TEXCOORD2;
 
                 UNITY_VERTEX_OUTPUT_STEREO //Insert
             };
@@ -41,6 +43,7 @@ Shader "Unlit/Portal"
             float4 _MainTex_ST;
             int displayMask;
             float4 _InactiveColour;
+            int _dimension3dFlag; //  0 - 2D // 1 - 3D
 
             float _multiplierValue;
 
@@ -55,24 +58,24 @@ Shader "Unlit/Portal"
                 o.eyeData = float4(unity_StereoEyeIndex, 0, 0, 0);
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.screenPos = ComputeScreenPos(o.vertex);
+                o.uv = v.uv;
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float2 uv = i.screenPos.xy;
-                
-                uv = uv / i.screenPos.w;
-
-                
-                
-
-               float multiplier = i.eyeData.x == 0 ?  - _multiplierValue.x : _multiplierValue.x;
-               uv.x = (uv.x) + multiplier;
-
-                fixed4 portalCol = tex2D(_MainTex, uv);
-                //portalCol.w *= 0.5f;
-                return portalCol;// *displayMask + _InactiveColour * (1 - displayMask);
+                float2 uv;
+                if (_dimension3dFlag == 1)
+                {
+                    uv = i.screenPos.xy / i.screenPos.w;
+                    float multiplier = i.eyeData.x == 0 ? -_multiplierValue.x : _multiplierValue.x;
+                    uv.x = (uv.x) + multiplier;
+                }
+                else {
+                    uv = i.uv;
+                }
+                fixed4 portalCol = tex2D(_MainTex, uv) + float4(0.1,0.1,0,1);
+                return portalCol;
             }
             ENDCG
         }

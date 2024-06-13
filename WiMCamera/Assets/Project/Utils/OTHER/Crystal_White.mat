@@ -55,24 +55,24 @@ Material:
     m_Floats:
     - Normal_Blend: 0.5
     - _BumpScale: 4.53
-    - _CrystalIOR: 1.84
+    - _CrystalIOR: 1.88
     - _DecalMeshBiasType: 0
     - _DecalMeshDepthBias: 0
     - _DecalMeshViewBias: 0
-    - _DelaunayAngleOffset1: 8.16
-    - _DelaunayAngleOffset2: 0.95
-    - _DelaunayCellDensity1: 8.87
-    - _DelaunayCellDensity2: 2.3
-    - _DelaunayStrength1: 2.59
-    - _DelaunayStrength2: 5.07
+    - _DelaunayAngleOffset1: 6.97
+    - _DelaunayAngleOffset2: 0.41
+    - _DelaunayCellDensity1: 3.79
+    - _DelaunayCellDensity2: 0.77
+    - _DelaunayStrength1: 1.43
+    - _DelaunayStrength2: 3.1
     - _DrawOrder: 0
     - _GLOBALClipRadius: 99999
     - _GildSmoothness: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _aLPHA: 0.9
+    - _aLPHA: 0.87
     m_Colors:
-    - _CrystalColor: {r: 0.12156868, g: 1, b: 0, a: 1}
+    - _CrystalColor: {r: 0.6069776, g: 0.80742997, b: 0.8301887, a: 0.49803922}
     - _GLOBALwimCenter: {r: 0, g: 0, b: 0, a: 0}
     - _GildColor: {r: 1, g: 0.108383924, b: 0, a: 1}
   m_BuildTextureStacks: []

@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ChangeRendering : MonoBehaviour
 {
@@ -8,6 +10,7 @@ public class ChangeRendering : MonoBehaviour
     public Material[] miniatureMaterials;
     Material[] originalMaterials;
     bool hasmesh;
+    Camera cam;
 
     void Awake()
     {
@@ -40,6 +43,34 @@ public class ChangeRendering : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        RenderPipelineManager.beginCameraRendering += ChangeColors;
+        RenderPipelineManager.endCameraRendering += ChangeColorsBack;
+    }
+
+    private void OnDestroy()
+    {
+        RenderPipelineManager.beginCameraRendering -= ChangeColors;
+        RenderPipelineManager.endCameraRendering -= ChangeColorsBack;
+    }
+
+    private void ChangeColorsBack(ScriptableRenderContext arg1, Camera arg2)
+    {
+        if (arg2 == cam)
+        {
+            ChangeMaterial(false);
+        }
+    }
+
+    private void ChangeColors(ScriptableRenderContext arg1, Camera arg2)
+    {
+        if (arg2 == cam)
+        {
+            ChangeMaterial(true);
+        }
+    }
+
     public void ChangeMesh()
     {
         if (!hasmesh)
@@ -63,5 +94,10 @@ public class ChangeRendering : MonoBehaviour
         {
             GetComponent<Renderer>().materials = originalMaterials;
         }
+    }
+
+    internal void SetupMe(Camera _cam)
+    {
+        cam = _cam;
     }
 }
